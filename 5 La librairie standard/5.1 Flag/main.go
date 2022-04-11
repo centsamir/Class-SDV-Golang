@@ -8,10 +8,10 @@ import (
 func main() {
 	const VERSION = "1.0"
 
-	var nFlag = flag.Bool("version", false, "test")
+	var nFlag = flag.Bool("version", false, "Show version")
 	flag.Parse()
 
 	if *nFlag == true {
-		fmt.Println("Version is ", VERSION)
+		fmt.Println(VERSION)
 	}
 }
