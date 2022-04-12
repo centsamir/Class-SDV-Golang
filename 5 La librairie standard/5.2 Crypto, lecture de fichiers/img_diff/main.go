@@ -35,5 +35,18 @@ func hashingFile(filePath string) []byte {
 
 func main() {
 	//fmt.Println(readFile("image_1.jpg"))
-	fmt.Println(hashingFile("image_1.jpg"))
+	//fmt.Println(hashingFile("image_1.jpg"))
+	//images := os.Args[1:]
+	//if len(images) <= 0 {
+	//	images = []string{"./images/*"}
+	//}
+	//fmt.Println(images)
+
+	log.SetOutput(os.Stderr)
+	log.SetPrefix("INFO: ")
+	log.SetFlags(log.Ldate)
+	log.Println("logger configured")
+	var err error
+	fmt.Println(err)
+
 }
