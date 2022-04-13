@@ -61,5 +61,7 @@ func main() {
 	//2.2
 	ch1 := make(chan Reponse)
 	ch2 := make(chan Reponse)
+	go callServer("http://localhost:8000/?id=id1", ch1)
+	go callServer("http://localhost:8000/?id=id3", ch2)
 
 }
