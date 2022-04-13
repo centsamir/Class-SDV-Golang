@@ -3,13 +3,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
+	"os/exec"
 )
 
 type User struct {
 	Login    string `json:"userName"` //1.2
 	Password string
-	UserID   int `json:"userID"` //2.2
+	UserID   string `json:"userID"` //2.2
 }
 
 func check(e error) {
@@ -18,7 +20,18 @@ func check(e error) {
 	}
 }
 
+//------------------//
+//2.4
+func ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+
+}
+
+//------------------//
+
 func main() {
+	cmd := exec.Command("clear") //Linux example, its tested
+	cmd.Stdout = os.Stdout
+	cmd.Run()
 	//1.1.
 	fmt.Println("1.1")
 	user := User{
@@ -42,12 +55,12 @@ func main() {
 
 	//2.3
 	fmt.Println("2.3")
-	var User3 map[string]User
-	fmt.Println(User3)
-	fmt.Println(user2[0])
-	for _, elem := range user2 {
-		User3["Login"] = 
-
+	User3 := make(map[string]string)
+	for i := 0; i < len(user2); i++ {
+		User3[user2[i].UserID] = user2[i].Login
 	}
-	
+	fmt.Println(User3)
+
+	//2.4
+	http.HandleFunc("/", ServeHTTP())
 }
