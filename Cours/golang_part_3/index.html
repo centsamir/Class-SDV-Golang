@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>Golang</title>
+    <link rel="shortcut icon" href="./favicon.ico" />
+    <link rel="stylesheet" href="./dist/reset.css" />
+    <link rel="stylesheet" href="./dist/reveal.css" />
+    <link rel="stylesheet" href="./dist/theme/night.css" id="theme" />
+    <link rel="stylesheet" href="./css/highlight/zenburn.css" />
+
+
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides"><section  data-markdown><script type="text/template">
+
+# Golang
+
+Une introduction pour DevOps - Part 3
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Concurrence et parallélisme
+
+- Quelle différence ?
+  <!-- .element: class="fragment" data-fragment-index="1" -->
+  - Concurrence: effectuer plusieurs tâches sans attendre d'en finir une pour en commencer une autre.
+  <!-- .element: class="fragment" data-fragment-index="2" -->
+
+  Ex : écrire deux textes différents sur deux feuilles de papier, en écrivant une ligne de chaque texte à la fois.
+   <!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+- Quelle différence ?
+ <!-- .element: class="fragment" data-fragment-index="1" -->
+  - Parallélisme: effectuer plusieurs tâches simultanément.
+   <!-- .element: class="fragment" data-fragment-index="2" -->
+
+  Ex : écrire les deux textes en même temps, avec un stylo dans chaque main.
+   <!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Rappels sur les threads
+
+- Un thread est un "fil d'exécution" de votre programme.
+ <!-- .element: class="fragment" data-fragment-index="1" -->
+- Il existe deux types de threads : les "threads lourds", ou "threads système", et les green-threads, ou "threads légers"
+ <!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Rappels sur les threads
+
+- Un thread lourd est un thread géré par l'OS. Il est dit lourd parce que généralement plus coûteux en ressources, et il faut communiquer avec l'OS pour le manipuler.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Un green thread est plus léger, il est géré par le runtime du programme.
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Pourquoi les threads ?
+
+- Pour les performances
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Pour les opérations bloquantes
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Threads, inconvénients.
+
+- La programmation d'un code multithreaded est plus difficile.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Il y a des risques qui n'existent pas dans la programmation non-threaded. Ex : deadlock, data races...
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Threads, mémoire.
+
+- La mémoire n'est pas automatiquement synchronisée entre les threads. Si on partage un objet entre plusieurs threads, cela peut causer des problèmes (data races).
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Threads, mémoire.
+
+- Comment est gérée la mémoire ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Exemple pour illustrer les data races, sur l'opération : compteur = compteur+1
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+![no_data_race](images/no_data_race.png)
+<!-- .element: class="fragment" data-fragment-index="3" style="float: left; width: 50%; height: 300px" -->
+![data_race](images/data_race.png)
+<!-- .element: class="fragment" data-fragment-index="3" style="float: left; width: 50%; height: 300px" -->
+
+Pas de data race
+<!-- .element: class="fragment" data-fragment-index="3" style="float: left; width: 50%; height: 300px" -->
+
+Data race
+<!-- .element: class="fragment" data-fragment-index="3" style="float: left; width: 50%; height: 300px" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Threads, mémoire.
+
+- Comment synchroniser ?
+  <!-- .element: class="fragment" data-fragment-index="1" -->
+  - Avec des mutexes
+  <!-- .element: class="fragment" data-fragment-index="2" -->
+  - Avec des channels => En Go on fait plutôt ça.
+  <!-- .element: class="fragment" data-fragment-index="3" -->
+
+  => "Partagez de la mémoire en communiquant, et non pas, partagez de la mémoire pour communiquer."
+  <!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Mutex
+
+- Ce sont des objets qui permettent de réguler l'accès aux données, en permettant par exemple qu'un seul thread y accède à la fois.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Penser à un verrou. Lorsqu'un thread accède à une donnée, elle ferme le verrou et garde la clé. Lorsque les opérations sont finies pour la donnée, ne pas oublier de libérer le verrou !
+<!-- .element: class="fragment" data-fragment-index="2" -->
+- Deadlock ?
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Threads en go
+
+- Ils sont appelés "goroutines".
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Ce sont des green threads : le runtime se charge de tout pour nous.
+Lorsqu'un thread lourd est nécessaire pour l'exécution du programme, le runtime se charge de le créer pour nous.
+<!-- .element: class="fragment" data-fragment-index="2" -->
+- Attention quand le thread de votre fonction main se termine, le programme se termine aussi, que les autres threads soient finis ou non !
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Threads en go : goroutine
+
+- Comment les lancer ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Mot clé "go"
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+```golang  
+func main(){
+  go maFunc() // Lance une goroutine qui exécute "maFunc()"
+}
+
+func maFunc(){
+  fmt.Println("je ne fais rien !")
+}
+```
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Threads en go
+
+- Pourquoi est-ce que le programme précédent n'affiche quasiment jamais rien ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- => La goroutine qui doit print est lancée, mais le thread de main() se termine immédiatement, et donc le programme aussi. La goroutine qui doit print est tuée avant d'avoir pu afficher quoi que ce soit.
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Threads en go
+
+On va parler des channels, mais pas des mutexes en Go.
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Threads en go : channels
+
+- C'est un type ! Un type header.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Sa zero value est "nil"
+<!-- .element: class="fragment" data-fragment-index="2" -->
+- Comme les maps, on les crée avec "make"
+<!-- .element: class="fragment" data-fragment-index="3" -->
+Rappel :
+```golang
+make(map[string]string)
+```
+- Pour les channels :
+<!-- .element: class="fragment" data-fragment-index="4" -->
+```golang
+make (chan [TYPE QUI PASSE DANS LE CHANNEL])
+```
+<!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Threads en go : channels
+
+- Il existe deux types de channels:
+<!-- .element: class="fragment" data-fragment-index="1" -->
+  - Buffered channels
+  <!-- .element: class="fragment" data-fragment-index="2" -->
+  - Non-buffered channels
+  <!-- .element: class="fragment" data-fragment-index="3" -->
+
+Référence :
+<!-- .element: class="fragment" data-fragment-index="4" -->
+https://golang.org/doc/effective_go.html#channels
+<!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Channels : non-buffered
+
+- Penser à un tuyau, dans lequel on peut envoyer de l'information.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Cette information est typée à l'avance :
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+```golang
+ch:= make(chan int)
+```
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+Dans ce channel, on ne peut envoyer que des int.
+<!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Channels : non-buffered
+
+- Comment écrire de l'information dans un channel ? =>
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+information := 0
+ch := make(chan int)
+
+ch <- information
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Channels : non-buffered
+
+- Comment lire de l'information dans un channel ? =>
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+information := 0
+ch := make(chan int)
+
+ch <- information
+
+informationLue := <-ch
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Channels : non-buffered
+
+- L'écriture et la lecture sont bloquantes.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Donc quand on écrit une valeur sur le channel, on ne peut rien faire avec tant que la valeur n'a pas été lue à l'autre bout.
+<!-- .element: class="fragment" data-fragment-index="2" -->
+- Même type de raisonnement en lecture
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Channels : buffered
+
+- Tout pareil que les non buffered channels, mais on a une file d'attente à l'intérieur du channel
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+// On peut mettre jusqu'à 10 int dedans sans bloquer. Leur ordre est préservé.
+ch := make(chan int, 10)
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Select statement
+
+- Comment signaler qu'une goroutine a terminé son travail ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+func main() {
+  ch := make(chan bool)
+  go maFonction(ch)
+  select {
+    case <-ch:
+      fmt.Println("j'ai fini !")
+    case <-time.After(time.Second):
+      fmt.Println("j'ai pas fini, mais tant pis !")
+  }
+}
+
+func maFonction(ch chan bool) {
+  time.Sleep(3*time.Second)
+  ch<-true
+}
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## wait groups
+
+- Un wait group est une struct, donc un type value (pas un type header !)
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Il sert à attendre qu'un groupe de goroutines aient fini leurs tâches avant d'avancer dans le programme. Il bloque donc le programme.
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## wait groups
+
+- On commence par le déclarer :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+var wg sync.WaitGroup // La zero value suffit
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+- Puis quand on lance une goroutine (juste avant), on ajoute un incrément au WaitGroup, et le passer en argument de la fonction :
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+```golang
+wg.Add(1)
+go maFunc(&wg)
+```
+<!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## wait groups
+
+- Il faut décrémenter ce compteur lorsque la goroutine a fini son execution :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+func maFunc(wg *WaitGroup){
+  defer wg.Done()
+}
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+- Enfin pour bloquer le programme jusqu'à la fin de l'exécution des goroutines, placer un Wait() à l'endroit choisi :
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+```golang
+func main(){
+// Tout le reste ici
+wg.Wait() // Cette ligne fait attendre que les goroutines soient achevées
+// Suite des instructions
+}
+```
+<!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## wait groups
+
+- Référence: https://golang.org/pkg/sync/#WaitGroup
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Closures
+
+- Ce sont des fonctions "anonymes". Autrement dit elles n'ont pas de nom.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Elles peuvent accéder à des variables définies en dehors de leur body :
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+```golang
+func main() {
+  l := 20
+  b := 30
+  func() { // C'est une closure
+    var area int
+    area = l * b
+    fmt.Println(area)
+    }()
+}
+```
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Closures
+
+On peut directement les lancer dans des goroutines comme cela :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+func main() {
+  l := 20
+  b := 30
+  go func() { // C'est une closure lancée dans une goroutine
+    var area int
+    area = l * b
+    fmt.Println(area)
+  }()
+}
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+</script></section></div>
+    </div>
+
+    <script src="./dist/reveal.js"></script>
+
+    <script src="./plugin/markdown/markdown.js"></script>
+    <script src="./plugin/highlight/highlight.js"></script>
+    <script src="./plugin/zoom/zoom.js"></script>
+    <script src="./plugin/notes/notes.js"></script>
+    <script src="./plugin/math/math.js"></script>
+    <script>
+      function extend() {
+        var target = {};
+        for (var i = 0; i < arguments.length; i++) {
+          var source = arguments[i];
+          for (var key in source) {
+            if (source.hasOwnProperty(key)) {
+              target[key] = source[key];
+            }
+          }
+        }
+        return target;
+      }
+
+      // default options to init reveal.js
+      var defaultOptions = {
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        plugins: [
+          RevealMarkdown,
+          RevealHighlight,
+          RevealZoom,
+          RevealNotes,
+          RevealMath
+        ]
+      };
+
+      // options from URL query string
+      var queryOptions = Reveal().getQueryHash() || {};
+
+      var options = extend(defaultOptions, {"transition":"fade"}, queryOptions);
+    </script>
+
+
+    <script>
+      Reveal.initialize(options);
+    </script>
+  </body>
+</html>
