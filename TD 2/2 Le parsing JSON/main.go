@@ -43,8 +43,11 @@ func main() {
 	//2.3
 	fmt.Println("2.3")
 	var User3 map[string]User
+	fmt.Println(User3)
+	fmt.Println(user2[0])
 	for _, elem := range user2 {
-		User3["Login"] = "dsdsds"
+		User3["Login"] = 
 
 	}
+	
 }

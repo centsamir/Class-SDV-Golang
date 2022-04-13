@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>Golang</title>
+    <link rel="shortcut icon" href="./favicon.ico" />
+    <link rel="stylesheet" href="./dist/reset.css" />
+    <link rel="stylesheet" href="./dist/reveal.css" />
+    <link rel="stylesheet" href="./dist/theme/night.css" id="theme" />
+    <link rel="stylesheet" href="./css/highlight/zenburn.css" />
+
+
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides"><section  data-markdown><script type="text/template">
+
+# Golang
+
+Une introduction pour DevOps - Part 1
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Origines
+
+- Né chez Google en 2007
+- Principalement conçu par :
+
+
+![Ken Thompson](https://cdn.facesofopensource.com/wp-content/uploads/2017/03/23214131/faces.KenThompson20515.web_.jpg)
+<!-- .element: style="float: left; width: 50%; height: 300px" -->
+
+![Rob Pike](https://live.staticflickr.com/710/22973772255_fbf68a7b0b_b.jpg)
+<!-- .element: style="float: left; width: 50%;" -->
+
+Ken Thompson
+<!-- .element: style="float: left; width: 50%; margin-top: 0px;" -->
+Rob Pike
+<!-- .element: style="float: left; width: 50%; margin-top: 0px;" -->
+
+<aside class="notes"><p>speaker notes FTW!</p>
+</aside></script></section><section  data-markdown><script type="text/template">
+
+## Pourquoi ?
+
+![XKCD](https://imgs.xkcd.com/comics/standards.png)
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Pourquoi ?
+
+- Temps de compilation du C++ trop longs <!-- .element: class="fragment" data-fragment-index="1" -->
+- Besoin de typage statique <!-- .element: class="fragment" data-fragment-index="2" -->
+
+```python
+def multiplyByFour(argsList):
+  output = ????
+
+  for arg in argsList:
+    output += arg * 4
+
+  return output
+# (pour rappel, ceci est valide en python:
+# argsList = ["name1", "long name1", 1, 2, 3])
+```
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Concrètement !
+
+- Un langage à syntaxe "C-like", impératif <!-- .element: class="fragment" data-fragment-index="1" -->
+- Pas de POO ("Composition over inheritance") <!-- .element: class="fragment" data-fragment-index="2" -->
+- Compilé <!-- .element: class="fragment" data-fragment-index="3" -->
+- Statiquement typé (avec inférence de type) <!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Avantages
+
+- Bibliothèque standard et des outils très complets <!-- .element: class="fragment" data-fragment-index="1" -->
+- Concurrence et parallélisme <!-- .element: class="fragment" data-fragment-index="2" -->
+- Garbage collection et sécurité mémoire <!-- .element: class="fragment" data-fragment-index="3" -->
+- Cross Compilation et static linking <!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Bibliothèque ?
+
+Bibliothèque standard très complète (https://golang.org/pkg/) :
+
+http, archives (tar, zip, bzip...), crypto, driver de DB, XML, JSON, hashing, testing, os... <!-- .element: class="fragment" data-fragment-index="1" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Outils ?
+
+Et des outils complets :
+- go fmt (formatting automatique du code) <!-- .element: class="fragment" data-fragment-index="1" -->
+- go mod (vendoring) <!-- .element: class="fragment" data-fragment-index="1" -->
+- go doc <!-- .element: class="fragment" data-fragment-index="1" -->
+- go test <!-- .element: class="fragment" data-fragment-index="1" -->
+- go install <!-- .element: class="fragment" data-fragment-index="1" -->
+... <!-- .element: class="fragment" data-fragment-index="1" -->
+
+Voir ici : https://golang.org/cmd/go/
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Go fmt
+
+- Formatage automatique du code :
+  - Aide à la standardisation de l'apparence du code <!-- .element: class="fragment" data-fragment-index="1" -->
+  - Évite les commits à "+800" parce que quelqu'un a reformaté dans son IDE <!-- .element: class="fragment" data-fragment-index="2" -->
+  - Permet aux autres outils go de manipuler le code <!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Go mod
+
+- Vendoring :
+  - Permet de s'affranchir de l'ancienne architecture (avec le $GOPATH) <!-- .element: class="fragment" data-fragment-index="1" -->
+  - Plus besoin de go get <!-- .element: class="fragment" data-fragment-index="2" -->
+  - Les dépendances sont définies dans un seul fichier "go.mod", et importées dans le code, "par fichier" <!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Go doc
+
+- Documentation :
+  - Est-ce que vous documentez vos scripts ? <!-- .element: class="fragment" data-fragment-index="1" -->
+  - Possibilité de récupérer de la documentation avec : <!-- .element: class="fragment" data-fragment-index="2" -->
+
+```shell
+$ go doc [Symbol]
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Go test
+
+- Les tests :
+  - Est-ce que vous testez vos scripts ? <!-- .element: class="fragment" data-fragment-index="1" -->
+  - Il suffit de placer ses tests dans des fichiers "\[nom_fichier\]_test.go", et de nommer les fonctions de test "Test_\[nom_fonction\]".
+  <!-- .element: class="fragment" data-fragment-index="2" -->
+  - Lancer les tests avec :<!-- .element: class="fragment" data-fragment-index="3" -->
+
+```shell
+$ go test ./...
+```
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Go install
+
+- Installation des paquets :
+  - Même chose qu'un package manager classique type npm, cargo, pip... <!-- .element: class="fragment" data-fragment-index="1" -->
+
+```shell
+$ go install https://github.com/FiloSottile/age
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Garbage collection / Sécurité mémoire
+
+- Pas de gestion directe des allocations mémoire <!-- .element: class="fragment" data-fragment-index="1" -->
+- Contrôle plus fin possible : <!-- .element: class="fragment" data-fragment-index="2" -->
+  - On a accès aux pointeurs, ou valeurs. <!-- .element: class="fragment" data-fragment-index="2" -->
+
+```golang  
+type Example struct{}
+
+func newExample() Example{
+  return Example{}
+}
+
+func newExamplePointer() *Example{
+  return &Example{}
+}
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+Exemple :
+```golang
+package main
+import "fmt"
+
+func main() {
+	message := "Hello Cosmos"
+
+	// Pointer to string
+	var pMessage *string
+
+	// pMessage points to addr of message
+	pMessage = &message
+	fmt.Println("Message = ", *pMessage)
+	fmt.Println("Message Address = ", pMessage)
+
+	// Change message using pointer de-referencing
+	*pMessage = "Hello Universe"
+	fmt.Println("Message = ", *pMessage)
+	fmt.Println("Message Address = ", pMessage)
+}
+```
+
+```shell
+$ go run cosmiclearn.go
+Message = Hello Cosmos
+Message Address = 0xc04203e1d0
+Message = Hello Universe
+Message Address = 0xc04203e1d0
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Garbage collection / Sécurité mémoire
+
+- Pas de gestion directe des allocations mémoire
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Contrôle plus fin possible
+<!-- .element: class="fragment" data-fragment-index="2" -->
+- Sécurité mémoire : attention, les nil pointer exceptions (panics en Go) sont possibles !
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Cross compilation & static linking
+
+- Possibilité de compiler pour "n'importe quelle" plateforme. Lister les targets possibles :
+```shell
+$ go tool dist list
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Cross compilation & static linking
+
+- Les binaires sont "self contained", "statically linked" : aucune dépendance au runtime
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Pour choisir une plateforme, il suffit de définir une variable d'environnement GOARCH pour l'architecture, et GOOS pour la plateforme :
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+```shell
+$ GOARCH=amd64 GOOS=linux go build ./...
+```
+<!-- .element: class="fragment" data-fragment-index="3" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## Architecture d'un programme
+
+- Un programme Go s'organise en packages
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Il y a une fonction main, dans le package main, qui sert à lancer le programme
+<!-- .element: class="fragment" data-fragment-index="2" -->
+- Un package est un "dossier" dans le code source qui sert à organiser le code
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Packages
+
+- Pour déclarer un package :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+```golang
+package main
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Pour utiliser un package :
+<!-- .element: class="fragment" data-fragment-index="2" -->
+```golang
+import "MonModule/main"
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Packages
+
+- Visibilité :
+  - Publique : commence avec une majuscule
+  <!-- .element: class="fragment" data-fragment-index="1" -->
+  ```golang
+  func MyFunc(){}
+  ```
+  <!-- .element: class="fragment" data-fragment-index="1" -->
+  - Privée : minuscule
+  <!-- .element: class="fragment" data-fragment-index="2" -->
+  ```golang
+  func myFunc(){}
+  ```
+  <!-- .element: class="fragment" data-fragment-index="2" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## Le code !
+
+- Déclarer une variable
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Définir une fonction
+<!-- .element: class="fragment" data-fragment-index="2" -->
+- Définir une méthode
+<!-- .element: class="fragment" data-fragment-index="3" -->
+- Les types de données
+<!-- .element: class="fragment" data-fragment-index="4" -->
+   - Les types "value"
+   <!-- .element: class="fragment" data-fragment-index="4" -->
+   - Les types "headers"
+  <!-- .element: class="fragment" data-fragment-index="4" -->
+- Les slices
+<!-- .element: class="fragment" data-fragment-index="5" -->
+- Types personnalisés
+<!-- .element: class="fragment" data-fragment-index="6" -->
+- Les "zero-value"
+<!-- .element: class="fragment" data-fragment-index="7" -->
+- Lecture des arguments passés au programme
+<!-- .element: class="fragment" data-fragment-index="8" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Déclarer une variable
+
+- Déclaration simple, puis initialisation
+<!-- .element: class="fragment" data-fragment-index="1" -->
+```golang
+var maChaine string
+maChaine = "test"
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Déclaration et initialisation en une seule ligne
+<!-- .element: class="fragment" data-fragment-index="2" -->
+```golang
+maChaine := "test"
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## Déclarer une fonction
+
+- Mot clé "func"
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Nom de fonction
+<!-- .element: class="fragment" data-fragment-index="2" -->
+- Argument Type, séparés par des parenthèses
+<!-- .element: class="fragment" data-fragment-index="3" -->
+- Retours
+<!-- .element: class="fragment" data-fragment-index="4" -->
+
+```golang
+func maFunc(arg1 string, arg2 string) (string, err){}
+```
+<!-- .element: class="fragment" data-fragment-index="4" -->
+Pour les types identiques, on peut aussi écrire :
+<!-- .element: class="fragment" data-fragment-index="5" -->
+```golang
+func maFunc(arg1, arg2 string) (string, error){}
+```
+<!-- .element: class="fragment" data-fragment-index="5" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## Définir une méthode
+
+- Il faut ajouter un champ qu'on appelle "receiver"
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Attention au receiver ! Pointeur, ou valeur !
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+```golang
+type Example struct{}
+func (ex *Example) maFunc(arg1, arg2 string) (string, error){}
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Les types de données
+
+- Go a deux grand "types" de données :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+  - Types "value"
+  <!-- .element: class="fragment" data-fragment-index="2" -->
+  - Types "headers"
+  <!-- .element: class="fragment" data-fragment-index="3" -->
+
+- Types "value"
+<!-- .element: class="fragment" data-fragment-index="4" -->
+  - Ce sont des types qui désignent directement la valeur qu'ils décrivent.
+<!-- .element: class="fragment" data-fragment-index="4" -->
+  - Exemple : les int, rune (équivalent de "char", alias de int32 en go), bytes (alias de int8 en go), bool...
+<!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Les types de données
+
+- Types "headers"
+<!-- .element: class="fragment" data-fragment-index="1" -->
+  - Ce sont des types qui comportent des références vers les valeurs décrites.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+  - Exemple : Les string. C'est un groupe de deux valeurs : une adresse sur le tas, et une longueur.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+  - Autre exemple : Les slices.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## Les slices
+
+- Ce sont des "vues", sur des tableaux.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- C'est un type qui a trois valeurs :
+<!-- .element: class="fragment" data-fragment-index="2" -->
+  - Un pointeur vers le premier élément du tableau
+<!-- .element: class="fragment" data-fragment-index="3" -->
+  - Une longueur (length)
+<!-- .element: class="fragment" data-fragment-index="4" -->
+    - Nombre d'éléments auxquels on a accès depuis le pointeur vers le premier élément. On l'obtient avec len(maSlice)
+<!-- .element: class="fragment" data-fragment-index="4" -->
+  - Une capacité (capacity)
+<!-- .element: class="fragment" data-fragment-index="5" -->
+    - Nombre d'éléments existant dans le tableau sous-jascent. On l'obtient avec cap(maSlice)
+  <!-- .element: class="fragment" data-fragment-index="5" -->
+
+
+</script></section><section  data-markdown><script type="text/template">
+
+```golang
+package main
+import (
+  "fmt"
+)
+func main() {
+  orig:=[]string{"one", "two", "three", "four"}
+  sl1:=test[0:2]
+  sl2:=test[1:3]
+  modifSlice(sl1, 1)
+  fmt.Printf("Ma slice 2: %v", sl2)
+}
+
+func modifSlice(sl []string, idx int){
+  sl[idx] = "modified"
+}
+```
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Vrai tableau ?
+
+Est-ce qu'on peut faire de "vrais" tableaux, et pas des slices ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+Oui ! Comme ça :
+<!-- .element: class="fragment" data-fragment-index="2" -->
+```golang
+vraiTableau:=[2]int{1,8}
+```
+<!-- .element: class="fragment" data-fragment-index="3" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## Définir son propre type
+
+- On peut définir des types qui contiennent plusieurs champs, à la manière des classes.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+- Attention, les types n'ont (presque toujours) que de la donnée à l'intérieur, pas de méthodes !
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+- Exemple :
+<!-- .element: class="fragment" data-fragment-index="3" -->
+```golang
+type ExempleType struct{
+  age int
+  nom string
+}
+```
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Définir son propre type
+
+On peut aussi définir des alias de types:
+<!-- .element: class="fragment" data-fragment-index="1" -->
+ - types interchangeables :
+ <!-- .element: class="fragment" data-fragment-index="2" -->
+```golang
+type T = string
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+ - nouveaux types :
+ <!-- .element: class="fragment" data-fragment-index="3" -->
+```golang
+type T string
+```
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Les "zero-value"
+
+- En go, l'initialisation des variables est automatique si elle n'est pas explicite
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Chaque type a une "zero-value", qui correspond à la valeur par défaut du type
+<!-- .element: class="fragment" data-fragment-index="2" -->
+- Exemples : 0 pour int, false pour bool, etc.
+<!-- .element: class="fragment" data-fragment-index="3" -->
+- Fonctionne pour tous types y compris structs, et "types header" !
+<!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Lecture des arguments
+
+On peut lire les arguments passés à un programme par une commande comme :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```shell
+$ go run main.go "image.png"
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Lecture des arguments
+
+Pour celà, il faut importer le package "os", et récupérer la slice de string "Args" :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+```golang
+argsWithProg := os.Args
+argsWithoutProg := os.Args[1:]
+arg := os.Args[3]
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Premier programme !
+
+- Dossier du projet
+
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```shell
+$ mkdir hello && cd hello
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## Premier programme !
+
+- Initialisation d'un module : création du fichier go.mod
+<!-- .element: class="fragment" data-fragment-index="1" -->
+```shell
+$ go mod init hello
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## Premier programme !
+
+- Déclaration du package, et fonction main
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+package main
+func main(){}
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## Premier programme !
+
+- Imports et appel
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+package main
+import "fmt"
+func main(){
+  fmt.Println("Hello, World!")
+}
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## On itère !
+
+Est-ce qu'on pourrait faire exécuter une commande système à notre programme ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+Essayons avec la commande "date", pour afficher la... date.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## On itère !
+
+Le package os/exec :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+https://golang.org/pkg/os/exec/
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Le type Cmd:
+<!-- .element: class="fragment" data-fragment-index="2" -->
+```
+Cmd represents an external command being prepared or run.
+A Cmd cannot be reused after calling its Run, Output or CombinedOutput methods.
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+- La fonction Command:
+<!-- .element: class="fragment" data-fragment-index="1" -->
+```golang
+func Command(name string, arg ...string) *Cmd
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- La méthode Output
+<!-- .element: class="fragment" data-fragment-index="2" -->
+```golang
+func (c *Cmd) Output() ([]byte, error)
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+</script></section><section  data-markdown><script type="text/template">
+
+- Revenons à notre exemple
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+package main
+import "fmt"
+func main() {
+  fmt.Println("Hello, World!")
+}
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+- On modifie la fonction :
+  Création de Cmd
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+package main
+import "fmt"
+func main(){
+  out, err := exec.Command("date").Output()
+  fmt.Println("Hello, World!")
+}
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+</script></section><section  data-markdown><script type="text/template">
+
+- Gestion des erreurs :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+package main
+import "fmt"
+func main(){
+  out, err := exec.Command("date").Output()
+  fmt.Println("Hello, World!")
+}
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+Ce code ne compile pas !
+<!-- .element: class="fragment" data-fragment-index="2" -->
+</script></section><section  data-markdown><script type="text/template">
+
+- Affichage du message de sortie :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+package main
+import (
+  "fmt"
+  "log"
+  "os/exec"
+)
+
+func main(){
+  out, err := exec.Command("date").Output()
+  if err!=nil {
+    log.Fatal(err)
+  }
+  fmt.Printf("The date is: %s\n", out)
+}
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## Pourquoi ça fonctionne ?
+
+- "date" fonctionne parce qu'elle est disponible sous Windows et sur les systèmes type Unix.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+Comment faire pour une commande qui dépend de l'OS ?
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+Réponse : la cross-compilation, et les instructions de compilation
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+- Comment spécifier au compilateur qu'on aimerait compiler tel code pour tel OS ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+  - En C par exemple, on peut mettre des headers.
+<!-- .element: class="fragment" data-fragment-index="2" -->
+  - En Go, on a plusieurs méthodes : noms de fichiers et annotations.
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Instructions compilateur et noms de fichiers
+
+- Il suffit de nommer ses fichiers avec un suffixe qui est le target de la plateforme pour laquelle on veut compiler.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- On a la liste des plateformes avec la commande donnée précédemment.
+<!-- .element: class="fragment" data-fragment-index="2" -->
+```shell
+$ go tool dist list
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+</script></section><section  data-markdown><script type="text/template">
+
+- Exemple de structure
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+![cross_compil](images/cross_compil_structure.png)
+<!-- .element: width: 500px;" class="fragment" data-fragment-index="1" -->
+</script></section><section  data-markdown><script type="text/template">
+
+Fichier Linux (getCommand_linux.go) :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+func GetCommand() []string{
+return []string{"ifconfig", "-a"}
+}
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+Fichier Windows (getCommand_windows.go) :
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+```golang
+func GetCommand() []string{
+return []string{"ipconfig", "/all"}
+}
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+Fichier main (tronqué) :
+<!-- .element: class="fragment" data-fragment-index="3" -->
+```golang
+cmd := GetCommand()
+out,err := exec.Command(cmd[0], cmd[1:]...).Output()
+```
+<!-- .element: class="fragment" data-fragment-index="3" -->
+</script></section><section  data-markdown><script type="text/template">
+
+- Instructions compilateur et annotations :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+  - Il est également possible d'utiliser des annotations pour les instructions.
+<!-- .element: class="fragment" data-fragment-index="2" -->
+  - C'est plus flexible, et plus "propre".
+<!-- .element: class="fragment" data-fragment-index="3" -->
+</script></section><section  data-markdown><script type="text/template">
+
+- Instructions compilateur et annotations :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+  - Supposons que l'on ait 4 targets différents à couvrir :
+<!-- .element: class="fragment" data-fragment-index="2" -->
+    MacOS, Windows (32bits), Openbsd, Linux.
+<!-- .element: class="fragment" data-fragment-index="2" -->
+  - Plutôt que de faire 4 fichiers, on factorise et on utilise des annotations comme ceci :
+<!-- .element: class="fragment" data-fragment-index="3" -->
+</script></section><section  data-markdown><script type="text/template">
+
+Fichier Unix (getCommand_unix.go) :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+```golang
+// +build linux darwin openbsd
+func GetCommand() []string{
+  return []string{"ifconfig", "-a"}
+}
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+Fichier Windows (getCommand_windows.go):
+<!-- .element: class="fragment" data-fragment-index="2" -->
+```golang
+// +build windows,386
+func GetCommand() []string{
+  return []string{"ipconfig", "/all"}
+}
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+Fichier main: inchangé.
+<!-- .element: class="fragment" data-fragment-index="3" -->
+</script></section><section  data-markdown><script type="text/template">
+
+Référence :
+https://golang.org/cmd/go/#hdr-Build_constraints
+</script></section></div>
+    </div>
+
+    <script src="./dist/reveal.js"></script>
+
+    <script src="./plugin/markdown/markdown.js"></script>
+    <script src="./plugin/highlight/highlight.js"></script>
+    <script src="./plugin/zoom/zoom.js"></script>
+    <script src="./plugin/notes/notes.js"></script>
+    <script src="./plugin/math/math.js"></script>
+    <script>
+      function extend() {
+        var target = {};
+        for (var i = 0; i < arguments.length; i++) {
+          var source = arguments[i];
+          for (var key in source) {
+            if (source.hasOwnProperty(key)) {
+              target[key] = source[key];
+            }
+          }
+        }
+        return target;
+      }
+
+      // default options to init reveal.js
+      var defaultOptions = {
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        plugins: [
+          RevealMarkdown,
+          RevealHighlight,
+          RevealZoom,
+          RevealNotes,
+          RevealMath
+        ]
+      };
+
+      // options from URL query string
+      var queryOptions = Reveal().getQueryHash() || {};
+
+      var options = extend(defaultOptions, {"transition":"fade"}, queryOptions);
+    </script>
+
+
+    <script>
+      Reveal.initialize(options);
+    </script>
+  </body>
+</html>

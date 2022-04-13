@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>Golang</title>
+    <link rel="shortcut icon" href="./favicon.ico" />
+    <link rel="stylesheet" href="./dist/reset.css" />
+    <link rel="stylesheet" href="./dist/reveal.css" />
+    <link rel="stylesheet" href="./dist/theme/night.css" id="theme" />
+    <link rel="stylesheet" href="./css/highlight/zenburn.css" />
+
+
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides"><section  data-markdown><script type="text/template">
+
+# Golang
+
+Une introduction pour DevOps - Part 2
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Rappels
+
+- On a deux catégories de types en Go : value et headers
+- Un type value décrit directement la valeur correspondante (un bool est bien un boolean, et pas une adresse vers un boolean)
+- Un type header contient des informations sur les valeurs qu'il décrit. On peut bien sûr récupérer ces valeurs.
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Rappels
+
+- Exemple de type header : les slices (trois valeurs: pointeur vers le premier élément, longueur, capacité)
+- Les zero values : ce sont les valeurs par défaut des types en Go.
+
+<aside class="notes"><p>speaker notes FTW!</p>
+</aside></script></section><section  data-markdown><script type="text/template">
+
+## Rappels pointeurs
+
+- Les pointeurs sont des adresses mémoire
+- Ils désignent un emplacement, où trouver "autre chose"
+- Cela peut être une valeur, ou un autre pointeur etc...
+
+Mais alors pourquoi utiliser des pointeurs ?
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Pourquoi ?
+
+Qu'affiche ce code ?
+
+```golang  
+package main
+import (
+  "fmt"
+)
+func main() {
+  ex:= Example{age: 10}
+  modifAge(ex, 43)
+  fmt.Println(ex)
+}
+
+type Example struct{
+  age int
+}
+
+func modifAge (ex Example, age int){
+  ex.age=age
+}
+```
+
+{10}
+ <!-- .element: class="fragment" data-fragment-index="1" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Pourquoi ?
+
+- Go est "pass by value" <!-- .element: class="fragment" data-fragment-index="1" -->
+  - C'est à dire que quand on passe une variable à une fonction par exemple, unecopie est faite, et c'est cette copie qui est utilisée dans la fonction. <!-- .element: class="fragment" data-fragment-index="1" -->
+
+- Comment "réparer" l'exemple précédent ? <!-- .element: class="fragment" data-fragment-index="2" -->
+  => Avec des pointeurs ! <!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+```golang  
+package main
+import (
+  "fmt"
+)
+func main() {
+  ex:= Example{age:10}
+  modifAge(&ex, 43)
+  fmt.Println(ex)
+}
+
+type Example struct{
+  age int
+}
+
+func modifAge(ex *Example, age int){
+  ex.age=age
+}
+```
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Les interfaces
+
+- C'est quoi une interface ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Un contrat :
+<!-- .element: class="fragment" data-fragment-index="2" -->
+  - Une liste de méthodes que doit respecter une entité qui l'implémente.
+<!-- .element: class="fragment" data-fragment-index="2" -->
+  - Si l'entité implémente ces méthodes, elle est alors aussi du type que cette interface définit.
+<!-- .element: class="fragment" data-fragment-index="2" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## Les interfaces
+
+- Une interface permet de grouper des types concrets par fonctionnalité
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Les interfaces peuvent aider pour tester le code
+<!-- .element: class="fragment" data-fragment-index="2" -->
+- Une interface est vérifée implicitement : si toutes les méthodes d'une interface sontimplémentées pour un type, alors ce type vérifie l'interface.
+<!-- .element: class="fragment" data-fragment-index="3" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## Les interfaces
+
+- Zero value : que se passe-t-il si on execute ce programme ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+package main
+
+func main() {
+  var ifce IfceTest
+  ifce.test()
+}
+
+type IfceTest interface {
+  test()
+}
+```
+
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- PANIC
+<!-- .element: class="fragment" data-fragment-index="2" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## Les interfaces
+
+- La zero value d'une interface est un pointeur nil
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Un pointeur nil, pour rappel, c'est une absence de pointeur.
+<!-- .element: class="fragment" data-fragment-index="2" -->
+- Appeler une méthode sur un pointeur nil, c'est appeler une méthode sur "rien" <!-- .element: class="fragment" data-fragment-index="3" -->
+
+=> Panic <!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Les interfaces
+
+- Comment initialiser l'interface dans notre exemple précédent ?
+
+</script></section><section  data-markdown><script type="text/template">
+```golang
+package main
+
+func main()
+{
+  var ifce IfceTest
+  ifce = Example{}
+  ifce.test()
+}
+
+type IfceTest interface {
+  test()
+}
+
+type Example struct{}
+
+func (ex Example)test(){}
+```
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Les interfaces
+
+- Si on a besoin de récupérer le type qui se cache sous une interface, au runtime ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+=> C'est possible avec un switch :
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+```golang
+func printType(i interface{}) {
+  switch v := i.(type) {
+    case int:
+      fmt.Println("The type is int !")
+    case string:
+      fmt.Println("The type is string !")
+    default:
+      fmt.Printf("I don't know about type %T!\n", v)
+    }
+}
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+</script></section><section  data-markdown><script type="text/template">
+
+## Les interfaces
+
+- Comment vérifier qu'une interface "contient" bien un type particulier (sans switch) ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+package main
+
+import
+(
+  "log"
+)
+
+func main()
+{
+  var ifce Ifce
+  ifce = Example{}
+  _, ok := ifce.(Example)
+  if !ok {
+    log.Fatal("Pas le type attendu !")
+  }
+}
+
+type Ifce interface {
+  test()
+}
+
+type Example struct {}
+
+func (ex Example)test() {}
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Les interfaces
+
+- En écriture condensée :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+package main
+
+import (
+  "log"
+)
+
+func main() {
+  var ifce Ifce
+  ifce = Example{}
+
+  if _, ok := ifce.(Example);!ok {
+    log.Fatal("Pas le type attendu !")
+  }
+}
+
+type Ifce interface {
+  test()
+}
+
+type Example struct {}
+
+func (ex Example)test() {}
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Parsing JSON
+
+- JSON est très utilisé dans les APIs de nos jours, et existe aussi dans les logs
+<!-- .element: class="fragment" data-fragment-index="1" -->
+- Parsing intégré dans la librairie standard
+<!-- .element: class="fragment" data-fragment-index="2" -->
+- Parsing se fait par annotations
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Parsing JSON
+
+- Exemple de données au format JSON :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```json
+{
+   "menu":{
+      "id":"file",
+      "value":"File",
+      "popup":{
+         "menuitem":[
+            { "value":"New", "onclick":"CreateNewDoc()" },
+            { "value":"Open", "onclick":"OpenDoc()" },
+            { "value":"Close", "onclick":"CloseDoc()"}
+         ]
+      }
+   }
+}
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Parsing JSON
+
+- Quels avantages ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+  - Simple à manipuler pour un programmeur
+  <!-- .element: class="fragment" data-fragment-index="2" -->
+  - Lisible par un humain, léger pour les machines
+  <!-- .element: class="fragment" data-fragment-index="3" -->
+  - "Facile à apprendre" parce que la syntaxe n'est pas extensible
+  <!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Parsing JSON
+
+- Quels inconvénients ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+  - Syntaxe non extensible (contrairement à du XML par exemple)
+  <!-- .element: class="fragment" data-fragment-index="2" -->
+  - Le typage limité affaiblit la sécurité
+  <!-- .element: class="fragment" data-fragment-index="3" -->
+  - On ne peut pas toujours commenter du JSON (dépend du parser)
+  <!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Parsing JSON
+
+- Comment générer du JSON ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+  - Créer une struct qui correspond aux données que l'on veut en sortie
+  <!-- .element: class="fragment" data-fragment-index="2" -->
+  - Utiliser des annotations si nécessaire
+  <!-- .element: class="fragment" data-fragment-index="3" -->
+  - Utiliser <!-- .element: class="fragment" data-fragment-index="4" --> https://golang.org/pkg/encoding/json/#Marshal
+  <!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+- Qu'affiche ce programme ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+package main
+
+import (
+    "encoding/json"
+    "fmt"
+)
+func main() {
+  group: = ColorGroup {
+    ID: 1,
+    Name: "Reds",
+    Colors: []string {"Crimson", "Red", "Ruby", "Maroon"},
+  }
+  b, err: = json.Marshal(group)
+  if err != nil {
+    fmt.Println("error:", err)
+  }
+  fmt.Println(string(b))
+}
+
+type ColorGroup struct {
+    ID int
+    Name string
+    Colors []string
+}
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+```json
+{"ID":1,"Name":"Reds","Colors":["Crimson","Red","Ruby","Maroon"]}
+```
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Parsing JSON
+
+- Comment déserialiser du JSON ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+  - Créer une struct qui correspond aux données que l'on veut lire
+  <!-- .element: class="fragment" data-fragment-index="2" -->
+  - Utiliser des annotations si nécessaire
+  <!-- .element: class="fragment" data-fragment-index="3" -->
+  - Utiliser<!-- .element: class="fragment" data-fragment-index="4" --> https://golang.org/pkg/encoding/json/#Unmarshal
+  <!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+```golang
+package main
+
+import (
+  "encoding/json"
+  "fmt"
+)
+
+func main() {
+  var jsonBlob = []byte(
+    `[
+        {"Name": "Platypus", "Order": "Monotremata"},
+        {"Name": "Quoll", "Order": "Dasyuromorphia"}
+    ]`)
+
+  var animals []Animal
+  err := json.Unmarshal(jsonBlob, &animals)
+  if err !=nil {
+    fmt.Println("error:", err)
+  }  
+  fmt.Printf("%+v", animals)
+}
+
+type Animal struct{
+  Name string
+  Order string
+}
+```
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Parsing JSON
+
+Importants : seuls les champs exportés seront serialisés/déserialisés.
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Parsing JSON
+
+### Les annotations
+
+- Les annotations permettent de redéfinir les noms des champs entre JSON et struct.
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+- Exemple :
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+```golang
+type Animal struct {
+  Species string `json:"Name"`
+  Od string `json:"Order"`
+}
+```
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+- On peut aussi spécifier que l'on ne veut pas que des champs vides soient ajoutés dans les JSON générés avec l'annotation suivante :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+type Animal struct {
+  Species string `json:",omitempty"`
+  Order string
+}
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+Qu'affiche ce programme ?
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+```golang
+package main
+import (
+    "encoding/json"
+    "fmt"
+)
+
+func main() {
+  type ColorGroup struct {
+    ID int
+    Name string
+    Colors []string `json:",omitempty"`
+  }
+  group: = ColorGroup {
+    ID: 1,
+    Name: "Reds",
+  }
+  b, err: = json.Marshal(group)
+  if err != nil {
+    fmt.Println("error:", err)
+  }
+  fmt.Println(string(b))
+}
+```    
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+```json
+{"ID":1,"Name":"Reds"}
+```
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Les maps !
+
+- C'est un header type
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+- Syntaxe
+<!-- .element: class="fragment" data-fragment-index="2" -->
+```golang
+map[Type_des_clés]Type_des_values
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+- Initialiser avec des valeurs :
+<!-- .element: class="fragment" data-fragment-index="3" -->
+```golang
+m := map[string]int{"bob": 5}
+```
+<!-- .element: class="fragment" data-fragment-index="3" -->
+
+- Initialiser vide :
+<!-- .element: class="fragment" data-fragment-index="4" -->
+```golang
+m := make(map[string]int)
+```
+<!-- .element: class="fragment" data-fragment-index="4" -->
+
+</script></section><section  data-markdown><script type="text/template">
+
+## Les maps
+
+- <!-- .element: class="fragment" data-fragment-index="1" --> Récuperer des valeurs (attention, si la clé est absente, on récupère la zero-value du type des valeurs !) :
+<!-- .element: class="fragment" data-fragment-index="1" -->
+```golang
+valeur := m["bob"]
+```
+<!-- .element: class="fragment" data-fragment-index="1" -->
+
+- Bonus : Récupérer une valeur et faire quelque chose si et seulement si la clé était présente :
+<!-- .element: class="fragment" data-fragment-index="2" -->
+
+```golang
+if val, ok := m["bob"]; ok {
+  //do something here
+}
+```
+<!-- .element: class="fragment" data-fragment-index="2" -->
+</script></section></div>
+    </div>
+
+    <script src="./dist/reveal.js"></script>
+
+    <script src="./plugin/markdown/markdown.js"></script>
+    <script src="./plugin/highlight/highlight.js"></script>
+    <script src="./plugin/zoom/zoom.js"></script>
+    <script src="./plugin/notes/notes.js"></script>
+    <script src="./plugin/math/math.js"></script>
+    <script>
+      function extend() {
+        var target = {};
+        for (var i = 0; i < arguments.length; i++) {
+          var source = arguments[i];
+          for (var key in source) {
+            if (source.hasOwnProperty(key)) {
+              target[key] = source[key];
+            }
+          }
+        }
+        return target;
+      }
+
+      // default options to init reveal.js
+      var defaultOptions = {
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        plugins: [
+          RevealMarkdown,
+          RevealHighlight,
+          RevealZoom,
+          RevealNotes,
+          RevealMath
+        ]
+      };
+
+      // options from URL query string
+      var queryOptions = Reveal().getQueryHash() || {};
+
+      var options = extend(defaultOptions, {"transition":"fade"}, queryOptions);
+    </script>
+
+
+    <script>
+      Reveal.initialize(options);
+    </script>
+  </body>
+</html>
