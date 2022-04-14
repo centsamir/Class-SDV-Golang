@@ -8,6 +8,8 @@ import (
 	"os/exec"
 )
 
+var User3 map[string]User
+
 type User struct {
 	Login    string `json:"userName"` //1.2
 	Password string
@@ -22,8 +24,34 @@ func check(e error) {
 
 //------------------//
 //2.4
-func ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (user *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	isUserID, userIDKey := searchId(r)
+	sendResponse(w, isUserID, userIDKey)
+}
 
+func sendResponse(w http.ResponseWriter, isUserID bool, userIDKey string) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	if isUserID {
+		w.WriteHeader(http.StatusOK)
+		b1, _ := json.Marshal(User3[userIDKey])
+		w.Write(b1)
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+	}
+}
+
+func searchId(r *http.Request) (bool, string) {
+	id := r.FormValue("id")
+	isUserID := false
+	userIDKey := ""
+	for k := range User3 {
+		if k == id {
+			isUserID = true
+			userIDKey = k
+			break
+		}
+	}
+	return isUserID, userIDKey
 }
 
 //------------------//
@@ -55,12 +83,20 @@ func main() {
 
 	//2.3
 	fmt.Println("2.3")
-	User3 := make(map[string]string)
+	// User3 := make(map[string]string)
+	// for i := 0; i < len(user2); i++ {
+	// 	User3[user2[i].UserID] = user2[i].Login
+	// }
+	User3 = make(map[string]User)
 	for i := 0; i < len(user2); i++ {
-		User3[user2[i].UserID] = user2[i].Login
+		User3[user2[i].UserID] = user2[i]
 	}
 	fmt.Println(User3)
 
 	//2.4
-	http.HandleFunc("/", ServeHTTP())
+	//2.5
+	http.Handle("/", &User{})
+	//2.6
+	http.ListenAndServe("localhost:4000", nil)
+	//2.7
 }
