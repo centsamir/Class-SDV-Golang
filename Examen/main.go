@@ -12,45 +12,49 @@ type Task struct {
 	Done        bool
 }
 
-var Stask []Task
+var Tasks []Task
+
+func checkErr(err error, rw http.ResponseWriter) {
+	if err != nil {
+		fmt.Printf("Error reading body: %v", err)
+		http.Error(rw, "can't read body", http.StatusBadRequest)
+	}
+}
 
 func main() {
 	racine := func(rw http.ResponseWriter, _ *http.Request) {
-		var ctask string
+		var stringTasks string
 		// je crée ma string en parcourant tout les chants de ma slide avec le format souhaité
-		for i, task := range Stask {
+		for i, task := range Tasks {
 			if !task.Done {
 				index := strconv.Itoa(i)
-				ctask += "ID: " + index + ", task: " + "\"" + task.Description + "\"" + " \n"
+				stringTasks += "ID: " + index + ", task: " + "\"" + task.Description + "\"" + " \n"
 			}
 		}
 		rw.WriteHeader(http.StatusOK)
-		ctaskEnBytes := []byte(ctask)
-		rw.Write(ctaskEnBytes)
+		tasksEnBytes := []byte(stringTasks)
+		rw.Write(tasksEnBytes)
 	}
 	done := func(rw http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			var ctask string
+			var stringTasks string
 			// je crée ma string en parcourant tout les chants de ma slide avec le format souhaité
-			for i, task := range Stask {
+			for i, task := range Tasks {
 				if task.Done {
 					index := strconv.Itoa(i)
-					ctask += "ID: " + index + ", task: " + "\"" + task.Description + "\"" + " \n"
+					stringTasks += "ID: " + index + ", task: " + "\"" + task.Description + "\"" + " \n"
 				}
 			}
 			rw.WriteHeader(http.StatusOK)
-			ctaskEnBytes := []byte(ctask)
-			rw.Write(ctaskEnBytes)
+			tasksEnBytes := []byte(stringTasks)
+			rw.Write(tasksEnBytes)
 		case "POST":
 			body, err := ioutil.ReadAll(r.Body)
-			if err != nil {
-				fmt.Printf("Error reading body: %v", err)
-				http.Error(rw, "can't read body", http.StatusBadRequest)
-			}
-			iBody, _ := strconv.Atoi(string(body))
-			if iBody <= len(Stask) {
-				Stask[iBody].Done = true
+			checkErr(err, rw)
+			id, _ := strconv.Atoi(string(body))
+			if id <= len(Tasks) {
+				Tasks[id].Done = true
 			} else {
 				rw.WriteHeader(http.StatusBadRequest)
 			}
@@ -63,16 +67,13 @@ func main() {
 			rw.WriteHeader(http.StatusBadRequest)
 		} else {
 			body, err := ioutil.ReadAll(r.Body)
-			if err != nil {
-				fmt.Printf("Error reading body: %v", err)
-				http.Error(rw, "can't read body", http.StatusBadRequest)
-			}
-			sBody := string(body)
+			checkErr(err, rw)
+			description := string(body)
 			task := Task{
-				Description: sBody,
+				Description: description,
 				Done:        false,
 			}
-			Stask = append(Stask, task)
+			Tasks = append(Tasks, task)
 			rw.WriteHeader(http.StatusOK)
 		}
 	}
