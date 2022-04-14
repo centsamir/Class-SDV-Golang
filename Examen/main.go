@@ -39,13 +39,11 @@ func main() {
 					ctask += "ID: " + index + ", task: " + "\"" + task.Description + "\"" + " \n"
 				}
 			}
-			fmt.Println(ctask)
 			rw.WriteHeader(http.StatusOK)
 			ctaskEnBytes := []byte(ctask)
 			rw.Write(ctaskEnBytes)
 		case "POST":
 			body, err := ioutil.ReadAll(r.Body)
-			fmt.Println(body, err)
 			if err != nil {
 				fmt.Printf("Error reading body: %v", err)
 				http.Error(rw, "can't read body", http.StatusBadRequest)
@@ -61,7 +59,6 @@ func main() {
 		}
 	}
 	add := func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println(r.Method)
 		if r.Method != "POST" {
 			rw.WriteHeader(http.StatusBadRequest)
 		} else {
@@ -76,7 +73,6 @@ func main() {
 				Done:        false,
 			}
 			Stask = append(Stask, task)
-			fmt.Println(sBody)
 			rw.WriteHeader(http.StatusOK)
 		}
 	}
