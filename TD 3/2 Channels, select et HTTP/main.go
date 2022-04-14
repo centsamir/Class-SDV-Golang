@@ -2,9 +2,11 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"sync"
 )
 
 func check(e error) {
@@ -19,8 +21,17 @@ type Reponse struct {
 	err      error
 }
 
+func (a Reponse) String() string {
+	response := a.respText
+	if a.err != nil {
+		response = a.err.Error()
+	}
+	return response
+}
+
 //2.3
-func callServer(adr string, ch chan Reponse) {
+func callServer(adr string, ch chan Reponse, wg *sync.WaitGroup) {
+	defer wg.Done()
 	//2.4
 	res, err := http.Get(adr)
 	//2.5
@@ -58,10 +69,18 @@ func callServer(adr string, ch chan Reponse) {
 }
 
 func main() {
+	//2.8
+	var wg sync.WaitGroup
 	//2.2
 	ch1 := make(chan Reponse)
 	ch2 := make(chan Reponse)
-	go callServer("http://localhost:8000/?id=id1", ch1)
-	go callServer("http://localhost:8000/?id=id3", ch2)
-
+	wg.Add(2)
+	//2.6- 2.7
+	go callServer("http://localhost:4000/?id=id1", ch1, &wg)
+	data := <-ch1
+	fmt.Println("ch1: ", data)
+	go callServer("http://localhost:4000/?id=id3", ch2, &wg)
+	data = <-ch2
+	fmt.Println("ch2: ", data)
+	wg.Wait()
 }
