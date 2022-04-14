@@ -25,21 +25,29 @@ func check(e error) {
 //------------------//
 //2.4
 func (user *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	//7.a
 	isUserID, userIDKey := searchId(r)
+	//7.b
 	sendResponse(w, isUserID, userIDKey)
 }
 
 func sendResponse(w http.ResponseWriter, isUserID bool, userIDKey string) {
+	//7.c
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	if isUserID {
+		//7.d
 		w.WriteHeader(http.StatusOK)
+		//7.b
 		b1, _ := json.Marshal(User3[userIDKey])
+		//7.e
 		w.Write(b1)
 	} else {
+		//7.d
 		w.WriteHeader(http.StatusNotFound)
 	}
 }
 
+//7.a
 func searchId(r *http.Request) (bool, string) {
 	id := r.FormValue("id")
 	isUserID := false
@@ -93,7 +101,6 @@ func main() {
 	}
 	fmt.Println(User3)
 
-	//2.4
 	//2.5
 	http.Handle("/", &User{})
 	//2.6
