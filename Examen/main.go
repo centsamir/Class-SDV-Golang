@@ -14,13 +14,6 @@ type Task struct {
 
 var Tasks []Task
 
-func checkErr(err error, rw http.ResponseWriter) {
-	if err != nil {
-		fmt.Printf("Error reading body: %v", err)
-		http.Error(rw, "can't read body", http.StatusBadRequest)
-	}
-}
-
 func main() {
 	racine := func(rw http.ResponseWriter, _ *http.Request) {
 		var stringTasks string
@@ -51,7 +44,10 @@ func main() {
 			rw.Write(tasksEnBytes)
 		case "POST":
 			body, err := ioutil.ReadAll(r.Body)
-			checkErr(err, rw)
+			if err != nil {
+				fmt.Printf("Error reading body: %v", err)
+				http.Error(rw, "can't read body", http.StatusBadRequest)
+			}
 			id, _ := strconv.Atoi(string(body))
 			if id <= len(Tasks) {
 				Tasks[id].Done = true
@@ -67,7 +63,10 @@ func main() {
 			rw.WriteHeader(http.StatusBadRequest)
 		} else {
 			body, err := ioutil.ReadAll(r.Body)
-			checkErr(err, rw)
+			if err != nil {
+				fmt.Printf("Error reading body: %v", err)
+				http.Error(rw, "can't read body", http.StatusBadRequest)
+			}
 			description := string(body)
 			task := Task{
 				Description: description,
